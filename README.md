@@ -3,14 +3,14 @@
 [![MiniMax](https://img.shields.io/badge/MiniMax-MCP%20Server-00A9FF?style=flat-square)](https://github.com/MiniMax-AI/MiniMax-MCP-JS)
 [![Token Plan Max](https://img.shields.io/badge/Token%20Plan%20Max-Compatible-10B981?style=flat-square)](#)
 
-> MiniMax Token Plan Max hesapları için düzeltilmiş MCP server. Orijinal [MiniMax-AI/MiniMax-MCP-JS](https://github.com/MiniMax-AI/MiniMax-MCP-JS) reposundan fork edilmiştir.
+> MiniMax'ın anlamsız hardcoded sınırlarına ve sürekli değişen modellerine isyan olarak doğmuş, "Token Plan Max" hesapları ve Otonom Ajanlar için optimize edilmiş, kurşun geçirmez bir MCP server fork'u. Orijinal [MiniMax-AI/MiniMax-MCP-JS](https://github.com/MiniMax-AI/MiniMax-MCP-JS) reposundan fork edilmiştir. İhtiyacı olan tüm geliştiricilere feda olsun! 🍻
 
 ## 📋 İçindekiler
 
-- [Neden Bu Proje?](#neden-bu-proje)
-- [Karşılaşılan Sorunlar](#karşılaşılan-sorunlar)
-- [Çözüm](#çözüm)
-- [Düzeltilen Hatalar](#düzeltilen-hatalar)
+- [Neden Bu Proje? (Kısa Cevap: MiniMax'ın Mallığı Yüzünden)](#neden-bu-proje)
+- [Karşılaşılan Sorunlar ve Saçmalıklar](#karşılaşılan-sorunlar)
+- [Neleri Çözdük? (Bizim Çözümümüz)](#çözüm)
+- [Düzeltilen Hatalar & Eklenen Özellikler](#düzeltilen-hatalar)
 - [Kurulum](#kurulum)
 - [Yapılandırma](#yapılandırma)
 - [Kullanım](#kullanım)
@@ -19,55 +19,46 @@
 
 ---
 
-## Neden Bu Proje?
+## Neden Bu Proje? (Kısa Cevap: MiniMax'ın Mallığı Yüzünden) <a name="neden-bu-proje"></a>
 
-MiniMax, AI araçları için Token Plan Max adında bir API servisi sunuyor. Bu API, [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) üzerinden erişilebilir.
+MiniMax, muazzam kalitede ses, müzik ve video üreten harika yapay zeka modelleri sunuyor. Üstelik global kullanıcılar için "Token Plan Max" adında süper bir abonelik planları da var.
 
-Hermes Agent (NousResearch) üzerinde MiniMax MCP server'ını kullanmak istedik. Ancak orijinal `minimax-mcp-js` paketi **Mainland China** API hesapları için optimize edilmişti. Token Plan Max (Global) hesapları ile kullanıldığında çalışmıyordu.
+Fakat resmi [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) entegrasyonlarına baktığımızda, kodun **"Mainland China"** hesapları için beton gibi hardcoded değerlerle doldurulduğunu gördük! 
+
+Hermes Agent (NousResearch) gibi otonom yapay zeka ajanlarımızla çalışırken karşılaştığımız tablo şuydu:
+- Model isimleri koda **sabit bir enum listesi** olarak gömülmüştü. MiniMax yeni bir model çıkarıyor (`speech-2.8-hd` veya `music-2.6` gibi), ama biz MCP yüzünden bunu kullanamıyoruz çünkü kod enum'a takılıp "Geçersiz Model" hatası basıyordu!
+- Sadece `api.minimax.chat` (Çin endpoint'i) kodlanmıştı. Token Plan Max kullanıcıları için gereken `api.minimax.io` endpoint'ini kullanamıyorduk.
+- Otonom ajanlarımızın hata aldığında başka modele geçmesini (failover) beklerken, MCP sunucusu hatayı 500 dönüyor veya JSON formatına uymadan saçmalıyordu.
+
+Kısacası MiniMax'ın kendi elleriyle yaptığı bu "katı ve statik" mimari yüzünden sistemlerimiz çöküyordu. Biz de "Yeter artık!" deyip kodu forklayarak, otonom ajanların ruhuna uygun, esnek, dinamik ve hataya toleranslı bu "Altın Standart" versiyonu oluşturduk. Bizim gibi çile çeken tüm geliştiricilere feda olsun!
 
 ---
 
-## Karşılaşılan Sorunlar
+## Karşılaşılan Sorunlar ve Saçmalıklar <a name="karşılaşılan-sorunlar"></a>
 
 ### 1. API Host Uyumsuzluğu
+Resmi pakette host zorla `api.minimax.chat` olarak bırakılmıştı. Global hesap sahipleri sürekli "Invalid API key" hatasıyla karşılaşıyordu.
 
-| Hesap Tipi | Doğru Host | Paketteki Host |
-|------------|------------|----------------|
-| Token Plan Max (Global) | `api.minimax.io` | `api.minimax.chat` ❌ |
-| Mainland China | `api.minimax.chat` | `api.minimax.chat` ✅ |
+### 2. Beton Gibi Enum'lar (Geçmişte Kalan Modeller)
+Yeni modeller çıkmasına rağmen paketteki Zod şemalarında eski modeller hardcoded enum olarak duruyordu. (Örn: `T2V-01`, `music-1.5`). Ajanımız `MiniMax-Hailuo-2.3` denemek istediğinde şema doğrulamasından geçemeyip patlıyordu.
 
-**Sorun:** Yanlış host kullanımı "Invalid API key" hatası veriyordu.
+### 3. Hata Yönetimi (Failover) Eksikliği
+Ajanlar hata aldıklarında (örneğin yetersiz token veya geçersiz prompt) 500 hatası yerine, neyin yanlış gittiğini bilmek ister. Orijinal kod düz bir hata fırlatıyordu.
 
-### 2. Güncellenmiş Model Adları
-
-MiniMax API, Token Plan Max için model adlarını güncelledi:
-
-| Özellik | Eski Model | Yeni Model |
-|---------|-----------|------------|
-| Text-to-Speech | `speech-02-hd` | `speech-2.8-hd` |
-| Video Generation | `T2V-01` | `MiniMax-Hailuo-2.3` |
-| Music Generation | `music-1.5` | `music-2.6` |
-
-**Sorun:** Pakette eski model adları var, yeni modeller çalışmıyordu.
-
-### 3. Video İşleme Süresi
-
-Token Plan Max modelleri daha uzun işleme süresine sahip. Pakette sadece eski model için 60 retries vardı, yeni model için 30 retries (10 dakika) yetersiz kalıyordu.
-
-### 4. Path Handling Crash
-
-`expandHomeDir` fonksiyonu `undefined` filepath ile çağrıldığında crash oluyordu.
+### 4. Uçucu Medya Linkleri
+Üretilen videoların ve seslerin URL'leri kısa süre sonra zaman aşımına uğruyor (expiry). URL modunda çalışan ajanlarımız daha dosyayı indiremeden link patlıyordu.
 
 ---
 
-## Çözüm
+## Neleri Çözdük? (Bizim Çözümümüz) <a name="çözüm"></a>
 
-Orijinal repoyu fork edip gerekli düzeltmeleri yaptık:
+Orijinal repoyu esnek, otonom ajan dostu ve üretim ortamına (production-ready) uygun hale getirdik:
 
-1. **API Host** → `api.minimax.io` (Global)
-2. **Varsayılan Modeler** → Token Plan Max uyumlu
-3. **Video Retries** → Yeni model için 60 retries (20 dakika)
-4. **Path Handling** → Undefined kontrolü eklendi
+1. **Dinamik Model Desteği (Hardcoded Enumlar Çöpe):** Şemalardaki tüm kısıtlayıcı enum değerleri kaldırıldı. Ajanınız istediği string'i model olarak yollayabilir. MiniMax yarın `music-3.0` çıkarırsa, hiçbir kod güncellemesi yapmadan doğrudan kullanabilirsiniz!
+2. **Global Endpoint Uyumluluğu:** Varsayılan host `api.minimax.io` olarak değiştirildi.
+3. **Şeffaf Hata Yönetimi (`isError: true`):** Ajan hata aldığında artık bu bir sistem çökmesi (500) değil. Doğrudan `{ isError: true, content: "Hata detayı..." }` dönerek ajanın durumu algılayıp "failover" (başka modele geçiş) yapabilmesini sağladık.
+4. **Çevre Değişkeni (Env Var) Odaklı Model Seçimi:** Varsayılan modeller `MINIMAX_DEFAULT_AUDIO_MODEL`, `MINIMAX_DEFAULT_VIDEO_MODEL` ve `MINIMAX_DEFAULT_MUSIC_MODEL` env variable'ları ile dinamik hale getirildi.
+5. **Varsayılan Olarak Yerel Dosya (Local Resource Mode):** Üretilen medyalar uçucu URL'ler olarak değil, doğrudan yerel bir dizine (`MINIMAX_MCP_BASE_PATH`) indiriliyor. Böylece dosya kayıpları engellendi.
 
 ---
 
