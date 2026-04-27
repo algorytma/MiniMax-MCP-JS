@@ -20,8 +20,8 @@ export class ImageAPI {
       throw new MinimaxRequestError(ERROR_PROMPT_REQUIRED);
     }
 
-    // Validate model
-    const model = this.ensureValidModel(request.model);
+    // Use requested model or default
+    const model = request.model || DEFAULT_T2I_MODEL;
 
     // Prepare request data
     const requestData: Record<string, any> = {
@@ -95,19 +95,5 @@ export class ImageAPI {
     return outputFiles;
   }
 
-  // Helper function to validate model
-  private ensureValidModel(model?: string): string {
-    // Use default model if not provided
-    if (!model) {
-      return DEFAULT_T2I_MODEL;
-    }
 
-    // Validate if model is valid
-    if (!VALID_IMAGE_MODELS.includes(model)) {
-      // console.error(`Warning: Provided image model ${model} is invalid, using default value ${DEFAULT_T2I_MODEL}`);
-      return DEFAULT_T2I_MODEL;
-    }
-
-    return model;
-  }
 }

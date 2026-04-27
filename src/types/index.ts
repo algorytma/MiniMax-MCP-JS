@@ -69,6 +69,7 @@ export interface PlayAudioRequest {
 export interface MusicGenerationRequest extends BaseToolRequest {
   prompt: string;
   lyrics: string;
+  model?: string;
   sampleRate?: number;
   bitrate?: number;
   format?: string;

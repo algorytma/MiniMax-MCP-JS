@@ -22,6 +22,7 @@ import {
   DEFAULT_BITRATE,
   DEFAULT_CHANNEL,
   DEFAULT_LANGUAGE_BOOST,
+  DEFAULT_MUSIC_MODEL,
   DEFAULT_T2I_MODEL,
   DEFAULT_VIDEO_MODEL
 } from './const/index.js';
@@ -289,6 +290,7 @@ export class MCPSSEServer {
                 text: `Failed to generate audio: ${error instanceof Error ? error.message : String(error)}`,
               },
             ],
+            isError: true,
           };
         }
       },
@@ -329,6 +331,7 @@ export class MCPSSEServer {
                 text: `Failed to list voices: ${error instanceof Error ? error.message : String(error)}`,
               },
             ],
+            isError: true,
           };
         }
       },
@@ -366,6 +369,7 @@ export class MCPSSEServer {
                 text: `Failed to play audio: ${error instanceof Error ? error.message : String(error)}`,
               },
             ],
+            isError: true,
           };
         }
       },
@@ -414,6 +418,7 @@ export class MCPSSEServer {
                   text: `Voice cloning failed: Real-name verification required. To use voice cloning feature, please:\n\n1. Visit MiniMax platform (${verificationUrl})\n2. Complete the real-name verification process\n3. Try again after verification is complete\n\nThis requirement is for security and compliance purposes.`,
                 },
               ],
+              isError: true,
             };
           }
 
@@ -425,6 +430,7 @@ export class MCPSSEServer {
                 text: `Voice cloning failed: ${error instanceof Error ? error.message : String(error)}`,
               },
             ],
+            isError: true,
           };
         }
       },
@@ -492,6 +498,7 @@ export class MCPSSEServer {
                 text: `Failed to generate image: ${error instanceof Error ? error.message : String(error)}`,
               },
             ],
+            isError: true,
           };
         }
       },
@@ -510,7 +517,7 @@ export class MCPSSEServer {
           .string()
           .optional()
           .default(DEFAULT_VIDEO_MODEL)
-          .describe('Model to use, values: ["T2V-01", "T2V-01-Director", "I2V-01", "I2V-01-Director", "I2V-01-live", "MiniMax-Hailuo-02"]'),
+          .describe('Model to use'),
         prompt: z.string().describe('Text prompt for video generation'),
         firstFrameImage: z.string().optional().describe('First frame image'),
         duration: z.number().optional().describe('The duration of the video. The model must be "MiniMax-Hailuo-02". Values can be 6 and 10.'),
@@ -575,6 +582,7 @@ export class MCPSSEServer {
                 text: `Failed to generate video: ${error instanceof Error ? error.message : String(error)}`,
               },
             ],
+            isError: true,
           };
         }
       },
@@ -593,7 +601,7 @@ export class MCPSSEServer {
           .string()
           .optional()
           .default('I2V-01')
-          .describe('Model to use, values: ["I2V-01", "I2V-01-Director", "I2V-01-live"]'),
+          .describe('Model to use'),
         prompt: z.string().describe('Text prompt for video generation'),
         firstFrameImage: z.string().describe('Path to the first frame image'),
         outputDirectory: COMMON_PARAMETERS_SCHEMA.outputDirectory,
@@ -656,6 +664,7 @@ export class MCPSSEServer {
                 text: `Failed to generate video: ${error instanceof Error ? error.message : String(error)}`,
               },
             ],
+            isError: true,
           };
         }
       }
@@ -718,6 +727,7 @@ export class MCPSSEServer {
                 text: `Failed to query video generation: ${error instanceof Error ? error.message : String(error)}`,
               },
             ],
+            isError: true,
           };
         }
       },
@@ -739,6 +749,11 @@ export class MCPSSEServer {
         lyrics: z
           .string()
           .describe('Song lyrics for music generation.\nUse newline (\\n) to separate each line of lyrics. Supports lyric structure tags [Intro][Verse][Chorus][Bridge][Outro]\nto enhance musicality. Character range: [10, 600] (each Chinese character, punctuation, and letter counts as 1 character)'),
+        model: z
+          .string()
+          .optional()
+          .default(DEFAULT_MUSIC_MODEL)
+          .describe('Model to use'),
         sampleRate: z
           .number()
           .optional()
@@ -796,6 +811,7 @@ export class MCPSSEServer {
                 text: `Failed to generate music: ${error instanceof Error ? error.message : String(error)}`,
               },
             ],
+            isError: true,
           };
         }
       },
@@ -855,6 +871,7 @@ export class MCPSSEServer {
                 text: `Failed to design voice: ${error instanceof Error ? error.message : String(error)}`,
               },
             ],
+            isError: true,
           };
         }
       },

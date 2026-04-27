@@ -304,7 +304,7 @@ export class MCPRestServer {
               description: 'Generate video based on text prompt',
               arguments: [
                 { name: 'prompt', description: 'Text prompt for video generation', required: true },
-                { name: 'model', description: 'Model to use, values: ["T2V-01", "T2V-01-Director", "I2V-01", "I2V-01-Director", "I2V-01-live", "MiniMax-Hailuo-02"]', required: false },
+                { name: 'model', description: 'Model to use', required: false },
                 { name: 'firstFrameImage', description: 'First frame image', required: false },
                 { name: 'outputDirectory', description: OUTPUT_DIRECTORY_DESCRIPTION, required: false },
                 { name: 'outputFile', description: 'Output file path, auto-generated if not provided', required: false },
@@ -355,7 +355,7 @@ export class MCPRestServer {
               arguments: [
                 { name: 'prompt', description: 'Text prompt for video generation', required: true },
                 { name: 'firstFrameImage', description: 'Path to first frame image', required: true },
-                { name: 'model', description: 'Model to use, values: ["I2V-01", "I2V-01-Director", "I2V-01-live"]', required: false },
+                { name: 'model', description: 'Model to use', required: false },
                 { name: 'outputDirectory', description: OUTPUT_DIRECTORY_DESCRIPTION, required: false },
                 { name: 'outputFile', description: 'Output file path, auto-generated if not provided', required: false },
                 { name: 'async_mode', description: 'Whether to use async mode. Defaults to False. If True, the video generation task will be submitted asynchronously and the response will return a task_id. Should use `query_video_generation` tool to check the status of the task and get the result', required: false }
@@ -379,6 +379,7 @@ export class MCPRestServer {
               arguments: [
                 { name: 'prompt', description: 'Music creation inspiration describing style, mood, scene, etc.', required: true },
                 { name: 'lyrics', description: 'Song lyrics for music generation.\nUse newline (\\n) to separate each line of lyrics. Supports lyric structure tags [Intro][Verse][Chorus][Bridge][Outro]\nto enhance musicality. Character range: [10, 600] (each Chinese character, punctuation, and letter counts as 1 character)', required: true },
+                { name: 'model', description: 'Model to use', required: false },
                 { name: 'sampleRate', description: 'Sample rate of generated music', required: false },
                 { name: 'bitrate', description: 'Bitrate of generated music', required: false },
                 { name: 'format', description: 'Format of generated music', required: false },
@@ -389,6 +390,7 @@ export class MCPRestServer {
                 properties: {
                   prompt: { type: 'string' },
                   lyrics: { type: 'string' },
+                  model: { type: 'string' },
                   sampleRate: { type: 'number' },
                   bitrate: { type: 'number' },
                   format: { type: 'string' },
@@ -498,7 +500,7 @@ export class MCPRestServer {
         await new Promise(resolve => setTimeout(resolve, RETRY_DELAY * Math.pow(2, attempt - 1)));
         return this.handleTextToAudio(args, api, mediaService, attempt + 1);
       }
-      throw this.wrapError('Failed to generate speech', error);
+      return { content: [{ type: 'text', text: `Failed to generate speech: ${error instanceof Error ? error.message : String(error)}` }], isError: true };
     }
   }
 
@@ -517,7 +519,7 @@ export class MCPRestServer {
         await new Promise(resolve => setTimeout(resolve, RETRY_DELAY * Math.pow(2, attempt - 1)));
         return this.handleListVoices(args, api, mediaService, attempt + 1);
       }
-      throw this.wrapError('Failed to list voices', error);
+      return { content: [{ type: 'text', text: `Failed to list voices: ${error instanceof Error ? error.message : String(error)}` }], isError: true };
     }
   }
 
@@ -536,7 +538,7 @@ export class MCPRestServer {
         ],
       };
     } catch (error) {
-      throw this.wrapError('Failed to play audio', error);
+      return { content: [{ type: 'text', text: `Failed to play audio: ${error instanceof Error ? error.message : String(error)}` }], isError: true };
     }
   }
 
@@ -555,7 +557,7 @@ export class MCPRestServer {
         await new Promise(resolve => setTimeout(resolve, RETRY_DELAY * Math.pow(2, attempt - 1)));
         return this.handleTextToImage(args, api, mediaService, attempt + 1);
       }
-      throw this.wrapError('Failed to generate image', error);
+      return { content: [{ type: 'text', text: `Failed to generate image: ${error instanceof Error ? error.message : String(error)}` }], isError: true };
     }
   }
 
@@ -574,7 +576,7 @@ export class MCPRestServer {
         await new Promise(resolve => setTimeout(resolve, RETRY_DELAY * Math.pow(2, attempt - 1)));
         return this.handleGenerateVideo(args, api, mediaService, attempt + 1);
       }
-      throw this.wrapError('Failed to generate video', error);
+      return { content: [{ type: 'text', text: `Failed to generate video: ${error instanceof Error ? error.message : String(error)}` }], isError: true };
     }
   }
 
@@ -602,6 +604,7 @@ export class MCPRestServer {
               text: `Voice cloning failed: Real-name verification required. To use voice cloning feature, please:\n\n1. Visit MiniMax platform (${verificationUrl})\n2. Complete the real-name verification process\n3. Try again after verification is complete\n\nThis requirement is for security and compliance purposes.`,
             },
           ],
+          isError: true,
         };
       }
 
@@ -612,7 +615,7 @@ export class MCPRestServer {
         await new Promise(resolve => setTimeout(resolve, RETRY_DELAY * Math.pow(2, attempt - 1)));
         return this.handleVoiceClone(args, api, mediaService, attempt + 1);
       }
-      throw this.wrapError('Failed to clone voice', error);
+      return { content: [{ type: 'text', text: `Failed to clone voice: ${error instanceof Error ? error.message : String(error)}` }], isError: true };
     }
   }
 
@@ -647,7 +650,7 @@ export class MCPRestServer {
         await new Promise(resolve => setTimeout(resolve, RETRY_DELAY * Math.pow(2, attempt - 1)));
         return this.handleImageToVideo(args, api, mediaService, attempt + 1);
       }
-      throw this.wrapError('Failed to generate video', error);
+      return { content: [{ type: 'text', text: `Failed to generate video: ${error instanceof Error ? error.message : String(error)}` }], isError: true };
     }
   }
 
@@ -660,7 +663,7 @@ export class MCPRestServer {
       const result = await mediaService.queryVideoGeneration(args);
       return result;
     } catch (error) {
-      throw this.wrapError('Failed to query video generation', error);
+      return { content: [{ type: 'text', text: `Failed to query video generation: ${error instanceof Error ? error.message : String(error)}` }], isError: true };
     }
   }
 
@@ -673,7 +676,7 @@ export class MCPRestServer {
       const result = await mediaService.generateMusic(args);
       return result;
     } catch (error) {
-      throw this.wrapError('Failed to generate music', error);
+      return { content: [{ type: 'text', text: `Failed to generate music: ${error instanceof Error ? error.message : String(error)}` }], isError: true };
     }
   }
 
@@ -686,7 +689,7 @@ export class MCPRestServer {
       const result = await mediaService.designVoice(args);
       return result;
     } catch (error) {
-      throw this.wrapError('Failed to design voice', error);
+      return { content: [{ type: 'text', text: `Failed to design voice: ${error instanceof Error ? error.message : String(error)}` }], isError: true };
     }
   }
 

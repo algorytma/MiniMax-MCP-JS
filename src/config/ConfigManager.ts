@@ -12,6 +12,7 @@ import {
   ENV_SERVER_ENDPOINT,
   ENV_SERVER_PORT,
   ENV_TRANSPORT_MODE,
+  RESOURCE_MODE_LOCAL,
   RESOURCE_MODE_URL,
   TRANSPORT_MODE_STDIO,
 } from '../const/index.js';
@@ -34,14 +35,14 @@ export class ConfigManager {
    */
   static getConfig(requestConfig: Partial<Config> = {}, defaultConfig: Partial<Config> = {}): Config {
     // Get user desktop path as default output path
-    const DesktopPath = process.env[ENV_MINIMAX_MCP_BASE_PATH]!;
+    const DesktopPath = process.env[ENV_MINIMAX_MCP_BASE_PATH] || process.cwd();
 
     // Create base configuration (lowest priority - 5)
     const config: Config = {
       apiKey: '',
       apiHost: DEFAULT_API_HOST,
       basePath: DesktopPath,
-      resourceMode: RESOURCE_MODE_URL,
+      resourceMode: RESOURCE_MODE_LOCAL,
       server: {
         port: DEFAULT_SERVER_PORT,
         endpoint: DEFAULT_SERVER_ENDPOINT,

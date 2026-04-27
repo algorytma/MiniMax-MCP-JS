@@ -30,7 +30,7 @@ export class MusicAPI {
 
     // Prepare request data
     const requestData: Record<string, any> = {
-      model: DEFAULT_MUSIC_MODEL,
+      model: request.model || DEFAULT_MUSIC_MODEL,
       prompt: request.prompt,
       lyrics: request.lyrics,
       audio_setting: {

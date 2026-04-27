@@ -8,6 +8,10 @@ export const ENV_SERVER_PORT = 'MINIMAX_SERVER_PORT';
 export const ENV_SERVER_ENDPOINT = 'MINIMAX_SERVER_ENDPOINT';
 export const ENV_CONFIG_PATH = 'MINIMAX_CONFIG_PATH';
 
+export const ENV_MINIMAX_DEFAULT_AUDIO_MODEL = 'MINIMAX_DEFAULT_AUDIO_MODEL';
+export const ENV_MINIMAX_DEFAULT_VIDEO_MODEL = 'MINIMAX_DEFAULT_VIDEO_MODEL';
+export const ENV_MINIMAX_DEFAULT_MUSIC_MODEL = 'MINIMAX_DEFAULT_MUSIC_MODEL';
+
 // Resource modes
 export const RESOURCE_MODE_URL = 'url';
 export const RESOURCE_MODE_LOCAL = 'local';
@@ -20,9 +24,9 @@ export const TRANSPORT_MODE_SSE = 'sse';
 
 // Default values
 export const DEFAULT_API_HOST = 'https://api.minimax.io';
-export const DEFAULT_SPEECH_MODEL = 'speech-2.8-hd';
+export const DEFAULT_SPEECH_MODEL = process.env.MINIMAX_DEFAULT_AUDIO_MODEL || 'speech-2.8-hd';
 export const DEFAULT_T2I_MODEL = 'image-01';
-export const DEFAULT_T2V_MODEL = 'MiniMax-Hailuo-2.3';
+export const DEFAULT_T2V_MODEL = process.env.MINIMAX_DEFAULT_VIDEO_MODEL || 'MiniMax-Hailuo-2.3';
 export const DEFAULT_VOICE_ID = 'male-qn-qingse';
 export const DEFAULT_EMOTION = 'happy';
 export const DEFAULT_FORMAT = 'mp3';
@@ -36,8 +40,8 @@ export const DEFAULT_LANGUAGE_BOOST = 'auto';
 export const DEFAULT_TRANSPORT_MODE = TRANSPORT_MODE_STDIO;
 export const DEFAULT_SERVER_PORT = 9593;
 export const DEFAULT_SERVER_ENDPOINT = '/rest';
-export const DEFAULT_MUSIC_MODEL = 'music-2.6';
-export const DEFAULT_VIDEO_MODEL = 'MiniMax-Hailuo-02';
+export const DEFAULT_MUSIC_MODEL = process.env.MINIMAX_DEFAULT_MUSIC_MODEL || 'music-2.6';
+export const DEFAULT_VIDEO_MODEL = process.env.MINIMAX_DEFAULT_VIDEO_MODEL || 'MiniMax-Hailuo-02';
 
 // Error messages
 export const ERROR_API_KEY_REQUIRED = 'API_KEY environment variable is required';
