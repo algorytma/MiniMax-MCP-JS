@@ -10,6 +10,7 @@ import { ConfigManager } from '../config/ConfigManager.js';
  * @returns Expanded path
  */
 function expandHomeDir(filepath: string): string {
+  if (!filepath) return filepath;
   if (filepath.startsWith('~/')) {
     return path.join(os.homedir(), filepath.slice(2));
   }

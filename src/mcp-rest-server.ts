@@ -426,8 +426,8 @@ export class MCPRestServer {
 
     // Call tool handler
     this.server.setRequestHandler(CallToolRequestSchema, async (request) => {
-      const toolName = request.params.tool;
-      const toolParams = request.params.params || {};
+      const toolName = request.params.name;
+      const toolParams = request.params.arguments || {};
 
       try {
         // Create configuration and API instance for this request

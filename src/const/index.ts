@@ -19,10 +19,10 @@ export const TRANSPORT_MODE_REST = 'rest';
 export const TRANSPORT_MODE_SSE = 'sse';
 
 // Default values
-export const DEFAULT_API_HOST = 'https://api.minimax.chat';
-export const DEFAULT_SPEECH_MODEL = 'speech-02-hd';
+export const DEFAULT_API_HOST = 'https://api.minimax.io';
+export const DEFAULT_SPEECH_MODEL = 'speech-2.8-hd';
 export const DEFAULT_T2I_MODEL = 'image-01';
-export const DEFAULT_T2V_MODEL = 'T2V-01';
+export const DEFAULT_T2V_MODEL = 'MiniMax-Hailuo-2.3';
 export const DEFAULT_VOICE_ID = 'male-qn-qingse';
 export const DEFAULT_EMOTION = 'happy';
 export const DEFAULT_FORMAT = 'mp3';
@@ -36,7 +36,7 @@ export const DEFAULT_LANGUAGE_BOOST = 'auto';
 export const DEFAULT_TRANSPORT_MODE = TRANSPORT_MODE_STDIO;
 export const DEFAULT_SERVER_PORT = 9593;
 export const DEFAULT_SERVER_ENDPOINT = '/rest';
-export const DEFAULT_MUSIC_MODEL = 'music-1.5';
+export const DEFAULT_MUSIC_MODEL = 'music-2.6';
 export const DEFAULT_VIDEO_MODEL = 'MiniMax-Hailuo-02';
 
 // Error messages
@@ -49,7 +49,7 @@ export const ERROR_LYRICS_REQUIRED = 'Lyrics are required for music generation.'
 export const ERROR_PREVIEW_TEXT_REQUIRED = 'Preview text is required for voice design.';
 
 // Default Values
-export const VALID_VIDEO_MODELS = ['T2V-01', 'T2V-01-Director', 'I2V-01', 'I2V-01-Director', 'I2V-01-live', 'S2V-01', "MiniMax-Hailuo-02"];
+export const VALID_VIDEO_MODELS = ['T2V-01', 'T2V-01-Director', 'I2V-01', 'I2V-01-Director', 'I2V-01-live', 'S2V-01', "MiniMax-Hailuo-02", "MiniMax-Hailuo-2.3"];
 export const VALID_IMAGE_MODELS = ['image-01'];
 
 

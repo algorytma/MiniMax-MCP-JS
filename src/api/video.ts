@@ -76,7 +76,7 @@ export class VideoAPI {
 
       // Step 2: Wait for video generation task to complete
       let fileId: string | null = null;
-      const maxRetries = model === "MiniMax-Hailuo-02" ? 60 : 30; // Maximum 30 attempts, total duration 10 minutes (30 * 20 seconds). MiniMax-Hailuo-02 model has a longer processing time, so we need to wait for a longer time
+      const maxRetries = 60; // Maximum 60 attempts, total duration 20 minutes (60 * 20 seconds). MiniMax models can have a longer processing time, so we need to wait for a longer time
       const retryInterval = 20; // 20 second interval
 
       for (let attempt = 0; attempt < maxRetries; attempt++) {
